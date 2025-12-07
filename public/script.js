@@ -37,32 +37,42 @@ playerForm.addEventListener("submit", async e => {
 
         if (result.success) {
             console.log("✅ Player saved successfully");
-            // Show success message briefly
             submitBtn.textContent = "✓ Saved!";
             submitBtn.style.backgroundColor = "#4CAF50";
-
-            setTimeout(() => {
-                playerDisplay.textContent = "Good luck, " + name + "!";
-                dataEntryScreen.classList.remove("active");
-                gameScreen.classList.add("active");
-                startGame();
-
-                // Reset button
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-                submitBtn.style.backgroundColor = "";
-            }, 1000);
         } else {
-            console.error("❌ Error saving player:", result.message);
+            console.warn("⚠️ Save failed, starting in Offline Mode:", result.message);
+            submitBtn.textContent = "Offline Mode";
+            submitBtn.style.backgroundColor = "#FF9800"; // Orange for offline
+        }
+
+        // Always start the game after a short delay
+        setTimeout(() => {
+            playerDisplay.textContent = "Good luck, " + name + "!";
+            dataEntryScreen.classList.remove("active");
+            gameScreen.classList.add("active");
+            startGame();
+
+            // Reset button
             submitBtn.textContent = originalBtnText;
             submitBtn.disabled = false;
-            alert("⚠️ Error saving data: " + result.message + "\n\nPlease check your internet connection or try again later.");
-        }
+            submitBtn.style.backgroundColor = "";
+        }, 1000);
+
     } catch (error) {
-        console.error("❌ Network error saving player:", error);
-        submitBtn.textContent = originalBtnText;
-        submitBtn.disabled = false;
-        alert("⚠️ Network error: Could not connect to server!\n\nPlease check your internet connection.\n\nError: " + error.message);
+        console.error("❌ Network error, starting in Offline Mode:", error);
+        submitBtn.textContent = "Offline Mode";
+        submitBtn.style.backgroundColor = "#FF9800";
+
+        setTimeout(() => {
+            playerDisplay.textContent = "Good luck, " + name + "!";
+            dataEntryScreen.classList.remove("active");
+            gameScreen.classList.add("active");
+            startGame();
+
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
+            submitBtn.style.backgroundColor = "";
+        }, 1000);
     }
 });
 
