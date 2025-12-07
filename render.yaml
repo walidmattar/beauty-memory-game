@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: beauty-memory-game
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: GOOGLE_CREDENTIALS
+        sync: false
