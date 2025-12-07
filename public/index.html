@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Beauty Memory Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Screen: Data Entry -->
+    <div id="dataEntryScreen" class="screen active">
+        <div class="content">
+            <img src="images/logo.png" alt="Palcare Logo" class="main-logo"
+                style="max-width: 80%; margin-bottom: 20px;">
+            <form id="playerForm">
+
+                <input type="text" id="playerName" placeholder="Your name" required>
+                <input type="email" id="playerEmail" placeholder="Email" required>
+                <input type="tel" id="playerPhone" placeholder="Phone" required>
+
+                <button type="submit" class="btn">Start Game</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Screen: Game -->
+    <div id="gameScreen" class="screen">
+        <div class="content-game">
+
+            <h2 id="playerDisplay"></h2>
+
+            <div class="stats">
+                <div>Moves: <span id="movesCount">0</span></div>
+                <div>Pairs: <span id="pairsCount">0/6</span></div>
+            </div>
+
+            <div id="gameBoard" class="board"></div>
+        </div>
+    </div>
+
+    <!-- Screen: Winner -->
+    <div id="winnerScreen" class="screen">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="winner-box">
+            <span class="trophy">🏆</span>
+            <h1>Congratulations, <span id="winnerName"></span>!</h1>
+            <p>You matched all the pairs!</p>
+
+            <div class="final-stats">
+                Total Moves: <span id="finalMoves">0</span>
+            </div>
+
+            <button id="playAgainBtn" class="btn">Start again</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

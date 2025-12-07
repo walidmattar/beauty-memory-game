@@ -1,0 +1,255 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+    --primary-color: #6b6e9b;
+    /* Purple */
+    --secondary-color: #7da7d9;
+    /* Blue */
+    --accent-color: #3b3b3b;
+    /* Dark Grey */
+    --text-color: #3b3b3b;
+    --background-gradient-start: #f5f5f5;
+    --background-gradient-end: #e0e0e0;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Lato', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    background: linear-gradient(135deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
+    height: 100vh;
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.screen.active {
+    display: flex;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.title {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-style: italic;
+}
+
+.content,
+.content-game,
+.winner-box {
+    text-align: center;
+    width: 90%;
+    max-width: 420px;
+    position: relative;
+    z-index: 101;
+    /* Ensure above canvas */
+}
+
+input {
+    width: 100%;
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 25px;
+    border: 2px solid transparent;
+    background: #fff;
+    font-size: 16px;
+    font-family: var(--font-body);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 20px rgba(107, 110, 155, 0.15);
+}
+
+.btn {
+    width: 100%;
+    margin-top: 25px;
+    padding: 16px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-size: 18px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(107, 110, 155, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(107, 110, 155, 0.4);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.stats {
+    font-size: 18px;
+    margin-bottom: 25px;
+    font-family: var(--font-heading);
+    color: var(--accent-color);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    justify-content: center;
+    padding: 10px;
+}
+
+.card {
+    width: 100%;
+    padding-bottom: 100%;
+    /* square */
+    position: relative;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.card-inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid #fff;
+}
+
+.card-back {
+    background: linear-gradient(135deg, #fff 0%, #f5f5f5 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-back img {
+    width: 80%;
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-back img {
+    transform: scale(1.05);
+}
+
+.card-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-front {
+    transform: rotateY(180deg);
+}
+
+/* Winner Screen */
+.winner-box h1 {
+    font-family: var(--font-heading);
+    font-size: 56px;
+    color: var(--primary-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.winner-box p {
+    font-size: 20px;
+    margin: 10px 0 30px;
+    color: #666;
+}
+
+.trophy {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+    display: block;
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-30px);
+    }
+
+    60% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Particles Canvas */
+#confetti-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+/* Match Animation Class */
+.card.matched .card-inner {
+    opacity: 0;
+    transform: scale(0.8) rotateY(180deg);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
