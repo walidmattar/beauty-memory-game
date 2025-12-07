@@ -23,11 +23,21 @@ app.use(express.static('public'));
 
 // Initialize Google Sheet Connection
 async function getDoc() {
-    if (!fs.existsSync(CREDENTIALS_FILE)) {
-        throw new Error('Credentials file not found! Please create google-credentials.json');
-    }
+    let creds;
 
-    const creds = require(CREDENTIALS_FILE);
+    if (process.env.GOOGLE_CREDENTIALS) {
+        // Option 1: Load from Environment Variable (Best for Render/Cloud)
+        try {
+            creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+        } catch (e) {
+            throw new Error('Failed to parse GOOGLE_CREDENTIALS environment variable');
+        }
+    } else if (fs.existsSync(CREDENTIALS_FILE)) {
+        // Option 2: Load from local file (Best for Local Development)
+        creds = require(CREDENTIALS_FILE);
+    } else {
+        throw new Error('Credentials not found! Please set GOOGLE_CREDENTIALS env var or create google-credentials.json');
+    }
 
     const serviceAccountAuth = new JWT({
         email: creds.client_email,
