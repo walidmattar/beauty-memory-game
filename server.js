@@ -72,9 +72,11 @@ app.post('/save-player', async (req, res) => {
             return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
+        // DEBUG: Google Sheets logic disabled to test deployment
+        /*
         const doc = await getDoc();
         const sheet = doc.sheetsByIndex[0];
-
+        
         const now = new Date();
         await sheet.addRow({
             Name: name,
@@ -83,8 +85,10 @@ app.post('/save-player', async (req, res) => {
             Date: now.toLocaleDateString('en-GB'),
             Time: now.toLocaleTimeString('en-GB')
         });
+        */
+        console.log('Mock save:', { name, email, phone });
 
-        res.json({ success: true, message: 'Saved successfully' });
+        res.json({ success: true, message: 'Saved successfully (Mock)' });
 
     } catch (error) {
         console.error('Error:', error);
