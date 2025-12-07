@@ -124,11 +124,15 @@ app.post('/save-player', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`\n🎮 Beauty Memory Game Server Running`);
-    console.log(`📍 URL: http://localhost:${PORT}`);
-    console.log(`☁️  Storage: Google Sheets`);
-    if (SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-        console.log(`⚠️  WARNING: You need to set SPREADSHEET_ID in server.js`);
-    }
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🎮 Beauty Memory Game Server Running`);
+        console.log(`📍 URL: http://localhost:${PORT}`);
+        console.log(`☁️  Storage: Google Sheets`);
+        if (SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
+            console.log(`⚠️  WARNING: You need to set SPREADSHEET_ID in server.js`);
+        }
+    });
+}
+
+module.exports = app;
