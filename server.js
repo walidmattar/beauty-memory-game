@@ -7,44 +7,49 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Use environment port for cloud deployment
+const PORT = process.env.PORT || 3000;
 
 // --------------------------------------------------------
-// CONFIGURATION - YOU MUST FILL THIS
+// CONFIGURATION
 // --------------------------------------------------------
-const SPREADSHEET_ID = '1X0l2EQf5O9_cm2W2KCu3dy_roVIxjXBU6olIq2yYbCA'; // <--- PASTE YOUR GOOGLE SHEET ID HERE
-const CREDENTIALS_FILE = path.join(__dirname, 'google-credentials.json');
+const SPREADSHEET_ID = '1X0l2EQf5O9_cm2W2KCu3dy_roVIxjXBU6olIq2yYbCA';
 // --------------------------------------------------------
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route to ensure index.html loads
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Initialize Google Sheet Connection
 async function getDoc() {
     let creds;
 
+    // Try Environment Variable first (Vercel/Render)
     if (process.env.GOOGLE_CREDENTIALS) {
-        // Option 1: Load from Environment Variable (Best for Render/Cloud)
         try {
             creds = JSON.parse(process.env.GOOGLE_CREDENTIALS);
         } catch (e) {
-            throw new Error('Failed to parse GOOGLE_CREDENTIALS environment variable');
+            console.error('Failed to parse GOOGLE_CREDENTIALS:', e);
+            throw new Error('Server configuration error: Invalid Credentials format');
         }
-    } else if (fs.existsSync(CREDENTIALS_FILE)) {
-        // Option 2: Load from local file (Best for Local Development)
-        creds = require(CREDENTIALS_FILE);
-    } else {
-        throw new Error('Credentials not found! Please set GOOGLE_CREDENTIALS env var or create google-credentials.json');
+    }
+    // Try local file (Local Development)
+    else if (fs.existsSync(path.join(__dirname, 'google-credentials.json'))) {
+        creds = require('./google-credentials.json');
+    }
+    else {
+        throw new Error('Credentials not found! Please set GOOGLE_CREDENTIALS env var.');
     }
 
     const serviceAccountAuth = new JWT({
         email: creds.client_email,
         key: creds.private_key,
-        scopes: [
-            'https://www.googleapis.com/auth/spreadsheets',
-        ],
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
 
     const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
@@ -54,71 +59,33 @@ async function getDoc() {
 
 // Save player data endpoint
 app.post('/save-player', async (req, res) => {
-    console.log('\n========================================');
-    console.log('📥 RECEIVED SAVE REQUEST');
-    console.log('========================================');
-
     try {
         const { name, email, phone } = req.body;
-        console.log('📝 Data received:', { name, email, phone });
 
-        // Validate input
         if (!name || !email || !phone) {
-            return res.status(400).json({
-                success: false,
-                message: 'All fields are required'
-            });
+            return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
-        if (SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-            throw new Error('Please set the SPREADSHEET_ID in server.js');
-        }
-
-        // Connect to Google Sheet
-        console.log('☁️ Connecting to Google Sheets...');
         const doc = await getDoc();
-        console.log(`✓ Connected to sheet: ${doc.title}`);
+        const sheet = doc.sheetsByIndex[0];
 
-        const sheet = doc.sheetsByIndex[0]; // Use the first sheet
-
-        // Get current date and time
         const now = new Date();
-        const date = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
-        const time = now.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
-        // Add row
         await sheet.addRow({
             Name: name,
             Email: email,
             Phone: phone,
-            Date: date,
-            Time: time
+            Date: now.toLocaleDateString('en-GB'),
+            Time: now.toLocaleTimeString('en-GB')
         });
 
-        console.log(`✓ Player saved to cloud: ${name}`);
-
-        res.json({
-            success: true,
-            message: 'Player data saved successfully to cloud'
-        });
+        res.json({ success: true, message: 'Saved successfully' });
 
     } catch (error) {
-        console.error('❌ Error saving player data:', error);
-
-        let userMessage = 'Error saving data to cloud';
-        if (error.message.includes('SPREADSHEET_ID')) {
-            userMessage = 'Server configuration error: Spreadsheet ID missing';
-        } else if (error.message.includes('Credentials')) {
-            userMessage = 'Server configuration error: Credentials missing';
-        }
-
+        console.error('Error:', error);
         res.status(500).json({
             success: false,
-            message: userMessage,
-            error: error.message
+            message: 'Server Error: ' + error.message,
+            details: error.toString()
         });
     }
 });
@@ -126,12 +93,7 @@ app.post('/save-player', async (req, res) => {
 // Start server
 if (require.main === module) {
     app.listen(PORT, () => {
-        console.log(`\n🎮 Beauty Memory Game Server Running`);
-        console.log(`📍 URL: http://localhost:${PORT}`);
-        console.log(`☁️  Storage: Google Sheets`);
-        if (SPREADSHEET_ID === 'YOUR_SPREADSHEET_ID_HERE') {
-            console.log(`⚠️  WARNING: You need to set SPREADSHEET_ID in server.js`);
-        }
+        console.log(`Server running on port ${PORT}`);
     });
 }
 
