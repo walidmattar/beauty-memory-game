@@ -40,7 +40,13 @@ async function getDoc() {
     }
     // Try local file (Local Development)
     else if (fs.existsSync(path.join(__dirname, 'google-credentials.json'))) {
-        creds = require('./google-credentials.json');
+        try {
+            const credsFile = fs.readFileSync(path.join(__dirname, 'google-credentials.json'), 'utf8');
+            creds = JSON.parse(credsFile);
+        } catch (e) {
+            console.error('Failed to read local credentials:', e);
+            throw new Error('Local credentials file is invalid');
+        }
     }
     else {
         throw new Error('Credentials not found! Please set GOOGLE_CREDENTIALS env var.');
