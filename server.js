@@ -18,15 +18,17 @@ const SPREADSHEET_ID = '1X0l2EQf5O9_cm2W2KCu3dy_roVIxjXBU6olIq2yYbCA';
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public'))); // Handled by Vercel now
 
-// Root route to ensure index.html loads
+// Root route - Not needed for API, but good for health check
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.send('Beauty Memory Game API is running');
 });
 
-// Initialize Google Sheet Connection
-async function getDoc() {
+// ... getDoc function ...
+
+// Save player data endpoint
+app.post('/api/save-player', async (req, res) => {
     let creds;
 
     // Try Environment Variable first (Vercel/Render)

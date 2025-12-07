@@ -23,7 +23,8 @@ playerForm.addEventListener("submit", async e => {
 
     try {
         console.log("Sending player data to server...");
-        const response = await fetch('/save-player', {
+        // Use the new API endpoint for Vercel
+        const response = await fetch('/api/save-player', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -241,16 +242,11 @@ function startFireworks() {
     }
 
     function animate() {
-        if (!winnerScreen.classList.contains("active")) return;
-
-        requestAnimationFrame(animate);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (Math.random() < 0.05) createFirework();
 
-        for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
+        particles.forEach((p, index) => {
             p.x += p.vx;
             p.y += p.vy;
             p.vy += 0.1; // Gravity
@@ -262,19 +258,20 @@ function startFireworks() {
             ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
             ctx.fill();
 
-            if (p.alpha <= 0) particles.splice(i, 1);
+            if (p.alpha <= 0) particles.splice(index, 1);
+        });
+
+        if (winnerScreen.classList.contains("active")) {
+            requestAnimationFrame(animate);
         }
     }
 
     animate();
 }
 
-document.getElementById("playAgainBtn").addEventListener("click", () => {
+// Start again button
+document.getElementById("restartBtn").addEventListener("click", () => {
     winnerScreen.classList.remove("active");
     dataEntryScreen.classList.add("active");
-
-    // Reset Form
-    document.getElementById("playerName").value = "";
-    document.getElementById("playerEmail").value = "";
-    document.getElementById("playerPhone").value = "";
+    document.getElementById("playerForm").reset();
 });
